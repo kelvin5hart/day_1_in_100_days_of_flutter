@@ -1,0 +1,57 @@
+import 'package:flutter/material.dart';
+class RotatingBox extends StatefulWidget {
+  final Widget child;
+  final int durationInSeconds;
+
+  const RotatingBox({super.key,
+    required this.child,
+    this.durationInSeconds = 50,
+  });
+
+  @override
+  State<RotatingBox> createState() => _RotatingBoxState();
+}
+
+class _RotatingBoxState extends State<RotatingBox> with SingleTickerProviderStateMixin {
+  late AnimationController animationController;
+  late Animation<double> animation;
+
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: widget.durationInSeconds),
+    );
+    animation = Tween<double>(
+      begin: 0,
+      end: 12.5664, // 2Radians (360 degrees)
+    ).animate(animationController);
+
+    animationController.forward();
+
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        animationController.repeat();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animationController,
+      builder: (context, child) => Transform.rotate(
+        angle: animation.value,
+        child: widget.child,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+}
+
